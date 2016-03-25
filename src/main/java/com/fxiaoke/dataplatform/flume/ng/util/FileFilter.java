@@ -29,7 +29,4 @@ public interface FileFilter {
      */
     boolean isSelected(File f);
 
-    public void setRecover(boolean b);
-
-    public boolean getRecover();
 }

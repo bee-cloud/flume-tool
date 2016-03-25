@@ -24,10 +24,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -35,37 +31,35 @@ import java.util.regex.Pattern;
  */
 public class RegexTimeFileFilter implements FileFilter {
     static final Logger LOG = LoggerFactory.getLogger(RegexTimeFileFilter.class);
-    Pattern p;
-    static final Pattern pFile = Pattern.compile("(?is)([0-9-_]|gz$)+");
+    private Pattern p;
+
     private String interval;
-    private String filterDate;
-    private String filterDate2;
-    private String persistAbsPath;
-    private boolean recover = true;
-    private String rotateRegex;
+    private String filterDateStart;
+    private String filterDateEnd;
+
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public RegexTimeFileFilter(String regex, String interval, String filterDate, String filterDate2, String persistAbsPath, String rotateRegex) {
+    private String timeReg;
+    private String timeFormat;
+
+    long timestampStart;
+    long timestampEnd;
+
+    long fileTimestamp;
+
+    public RegexTimeFileFilter(String regex, String interval, String filterDateStart, String filterDateEnd,String timeReg,String timeFormat) {
         this.p = Pattern.compile(regex);
         this.interval = interval;
-        this.filterDate = filterDate;
-        this.filterDate2 = filterDate2;
-        this.persistAbsPath = persistAbsPath;
-        this.rotateRegex = rotateRegex;
+        this.filterDateStart = filterDateStart;
+        this.filterDateEnd = filterDateEnd;
+        this.timeReg=timeReg;
+        this.timeFormat=timeFormat;
 
-        LOG.debug("scp regex" + regex);
-        LOG.debug("scp regex" + interval);
-        LOG.debug("scp regex" + filterDate);
-        LOG.debug("scp regex persistAbsPath:" + persistAbsPath);
-        LOG.debug("scp rotateregex:" + rotateRegex);
-    }
+        LOG.debug("regex:" + regex);
 
-    public void setRecover(boolean b) {
-        recover = b;
-    }
-
-    public boolean getRecover() {
-        return recover;
+        LOG.debug("interval:" + interval);
+        LOG.debug("filterDateStart:" + filterDateStart);
+        LOG.debug("filterDateEnd:" + filterDateEnd);
     }
 
     @Override
@@ -73,126 +67,63 @@ public class RegexTimeFileFilter implements FileFilter {
         LOG.debug("scp regex enter selecte");
         LOG.debug("filename=" + f.getName());
 
+        boolean isMatch = p.matcher(f.getName()).matches();
+        boolean rb;
 
+        timestampStart=0;
+        timestampEnd=0;
 
-        boolean regx = p.matcher(f.getName()).matches();
-        boolean rb = false;
-
-        long timestamp = 0;
-        long timestamp2 = 0;
-        long lastModified = 0;
-        long fileTimestamp = 0;
-
-        LOG.debug("regx=" + regx);
-
-        if (!regx) {
-            return regx;
+        if (!isMatch) {
+            return false;
         }
 
         try {
-            if (!filterDate.equals("")) {
-                timestamp = formatter.parse(filterDate).getTime();
+            if (!filterDateStart.equals("")) {
+                timestampStart = formatter.parse(filterDateStart).getTime();
+            }else{
+                return true;
             }
-            timestamp2 = 0;
 
-            if (!filterDate2.equals("")) {
-                timestamp2 = formatter.parse(filterDate2).getTime();
+            if (!filterDateEnd.equals("")) {
+                timestampEnd = formatter.parse(filterDateEnd).getTime();
 
-                if (timestamp2 < timestamp && timestamp > 0) {
-                    LOG.warn("filterDate should be gt filterDate2");
+                if (timestampEnd < timestampStart && timestampStart > 0) {
+                    LOG.warn("filterDateEnd should be gt filterDateStart");
                     return false;
                 }
             }
 
-            lastModified = f.lastModified();
-            fileTimestamp = new Date(lastModified).getTime();
+            fileTimestamp = Tools.getFileTimestamp(f.getAbsolutePath(),timeReg, timeFormat);
 
-            LOG.debug("scp regex fileTimestamp:" + fileTimestamp);
-            LOG.debug("scp regex timestamp:" + timestamp);
+            LOG.debug("fileTimestamp:" + fileTimestamp);
+            LOG.debug("timestampStart:" + timestampStart);
+            LOG.debug("timestampEnd:" + timestampEnd);
 
             if (interval.equals("")) {
-                rb = regx;
+                rb = true;
             } else if (interval.equals("eq")) {
-                //return fileTimestamp==timestamp;
-                rb = fileTimestamp == timestamp;
+                rb = fileTimestamp == timestampStart;
             } else if (interval.equals("lt")) {
-                rb = fileTimestamp < timestamp;
+                rb = fileTimestamp < timestampStart;
             } else if (interval.equals("le")) {
-                rb = fileTimestamp <= timestamp;
+                rb = fileTimestamp <= timestampStart;
             } else if (interval.equals("gt")) {
-                rb = fileTimestamp > timestamp;
+                rb = fileTimestamp > timestampStart;
             } else if (interval.equals("ge")) {
-                rb = fileTimestamp >= timestamp;
+                rb = fileTimestamp >= timestampStart;
             } else if (interval.equals("ne")) {
-                rb = fileTimestamp != timestamp;
+                rb = fileTimestamp != timestampStart;
             } else if (interval.equals("range")) {
-                rb = fileTimestamp >= timestamp && fileTimestamp <= timestamp2;
+                rb = fileTimestamp >= timestampStart && fileTimestamp <= timestampEnd;
             } else {
                 rb = true;
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOG.warn("fileSelect error:",e);
             return false;
         }
 
-        LOG.debug("rb=" + rb);
-        LOG.debug("recover=" + recover);
-
-        if (!rb) {
-            return rb;
-        }
-
-        String fileName = f.getName();
-        Matcher m1 = pFile.matcher(fileName);
-        String fileSub1 = m1.replaceAll("");
-
-        if (fileSub1.equals(fileName)) {
-            if (rotateRegex.equals("")) {
-                LOG.warn("filesub error");
-                return false;
-            } else {
-                return true;
-            }
-        }
-
-        Map<String, List<Long>> offsetMap = PersistOffset.getOffsetMap(persistAbsPath);
-
-        LOG.debug("offsetMap size:" + offsetMap.size());
-
-        if (offsetMap.size() == 0) {
-            setRecover(false);
-            return rb;
-        }
-        boolean rb2 = false;
-
-        for (Map.Entry<String, List<Long>> map : offsetMap.entrySet()) {
-            String filePath = map.getKey();
-            Matcher m = pFile.matcher(filePath);
-            String fileSub = m.replaceAll("");
-
-            LOG.debug(String.format("filesub:%s filepath:%s", fileSub, filePath));
-
-            if (fileSub.equals(filePath)) {
-                continue;
-            }
-
-            LOG.debug(String.format("filesrc:%s filedst:%s filesub:%s", filePath, fileName, fileSub));
-
-            if (fileSub1.equals(fileSub)) {
-                rb = fileName.compareTo(filePath) >= 0;
-                LOG.debug("rb:" + rb);
-                if (rb) {
-                    rb2 = true;
-                }
-            }
-        }
-
-        if (rb2) {
-            return rb2;
-        } else {
-            return rb;
-        }
-
+        return rb;
     }
 
 }

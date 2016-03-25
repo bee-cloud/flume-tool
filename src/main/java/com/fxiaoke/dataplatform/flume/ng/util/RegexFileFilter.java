@@ -38,10 +38,4 @@ public class RegexFileFilter implements FileFilter {
         return p.matcher(f.getName()).matches();
     }
 
-    public boolean getRecover() {
-        return false;
-    }
-
-    public void setRecover(boolean b) {
-    }
 }
