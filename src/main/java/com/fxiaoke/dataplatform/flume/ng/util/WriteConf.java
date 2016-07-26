@@ -82,7 +82,7 @@ public class WriteConf {
 
                 split=filePath.split("/");
 
-                logicalNode=split[split.length-2]+"_"+split[split.length-1].replaceAll("\\.log","");
+                logicalNode=split[split.length-2]+"."+split[split.length-1].replaceAll("\\.\\d{4}.*\\.log","");
 
 	    	out.write((MessageFormat.format(agentSourcesLogicalNode,current,logicalNode)+"\n").getBytes("utf-8"));
 

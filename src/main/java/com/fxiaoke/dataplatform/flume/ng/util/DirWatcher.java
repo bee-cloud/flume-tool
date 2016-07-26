@@ -23,16 +23,14 @@ public class DirWatcher {
     private long sleep_ms;
     private Periodic thread;
     private FileFilter filter;
-    private String rotateRegex;
     public boolean initIsRotate = false;
-    public boolean recover = false;
     private boolean isDirExist;
     private boolean flags = false;
 
     /**
      * checkperiod is the amount of time in milliseconds between directory polls.
      */
-    public DirWatcher(File dir, FileFilter filter, long checkPeriod, String rotateRegex) {
+    public DirWatcher(File dir, FileFilter filter, long checkPeriod) {
         Preconditions.checkNotNull(dir);
         Preconditions.checkArgument(dir.isDirectory(), dir + " is not a directory");
         isDirExist = true;
@@ -40,7 +38,6 @@ public class DirWatcher {
         this.dir = dir;
         this.sleep_ms = checkPeriod;
         this.filter = filter;
-        this.rotateRegex = rotateRegex;
     }
 
     /**
@@ -108,7 +105,7 @@ public class DirWatcher {
                 }
             } catch (InterruptedException e) {
                 LOG.warn("Maybe dir: " + dir + " is not exists");
-                e.printStackTrace();
+                LOG.warn("InterruptedException:",e);
             }
 
             LOG.debug("exit dirwatchthread");
@@ -121,13 +118,12 @@ public class DirWatcher {
      */
     public boolean check() {
         File[] files = dir.listFiles();
-        if (files == null) { // directory is no longer present
+        if (files == null) {
             LOG.info("dir " + dir.getAbsolutePath() + " does not exist!");
             isDirExist = false;
-            // notifying about files deletion in case there were any
+
             Set<File> removedFiles = new HashSet<File>(previous);
             for (File f : removedFiles) {
-                // filter is not applied to dirs
                 if (f.isDirectory() || filter.isSelected(f)) {
                     fireDeletedFile(f);
                 }
@@ -144,52 +140,27 @@ public class DirWatcher {
         }
 
         Set<File> newfiles = new HashSet<File>(Arrays.asList(files));
-
-        // figure out what was created
         Set<File> addedFiles = new HashSet<File>(newfiles);
         addedFiles.removeAll(previous);
         List<File> addFiles = new ArrayList<File>();
 
         for (File f : addedFiles) {
-            // filter is not applied to dirs
             if (f.isDirectory() || filter.isSelected(f)) {
                 addFiles.add(f);
             } else {
-                newfiles.remove(f); // don't keep filtered out files
+                newfiles.remove(f);
             }
         }
 
         Collections.sort(addFiles);
 
-        //Collections.reverse(addFiles);
-        if (addFiles.size() > 0) {
-            File firstFile = addFiles.get(0);
-            LOG.debug("###### before " + addFiles);
-            if (!Strings.isNullOrEmpty(rotateRegex)
-                    && !firstFile.getName().matches(rotateRegex)) {
-                int size = addFiles.size();
-                if (size > 1) {
-                    File lastFile = addFiles.get(size - 1);
-                    addFiles.set(0, lastFile);
-                    addFiles.set(size - 1, firstFile);
-                }
-            }
-            LOG.debug("###### end " + addFiles);
-        }
-
-
         for (File f : addFiles) {
             fireCreatedFile(f);
         }
 
-        // figure out what was deleted
         Set<File> removedFiles = new HashSet<File>(previous);
         removedFiles.removeAll(newfiles);
         for (File f : removedFiles) {
-            // firing event on every deleted File: filter can NOT be applied
-            // since we don't want to filter out directories and f.isDirectory() is
-            // always false for removed dir. Anyways, as long as "previous" contains only
-            // filtered files (or dirs) no need to apply filter here.
             fireDeletedFile(f);
         }
 
