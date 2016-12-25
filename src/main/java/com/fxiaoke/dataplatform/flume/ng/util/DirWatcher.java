@@ -1,7 +1,6 @@
 package com.fxiaoke.dataplatform.flume.ng.util;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,13 +16,13 @@ public class DirWatcher {
 
     final private List<DirChangeHandler> list = Collections
             .synchronizedList(new ArrayList<DirChangeHandler>());
+    public boolean initIsRotate = false;
     private File dir;
     private volatile boolean done = false;
     private Set<File> previous = new HashSet<File>();
     private long sleep_ms;
     private Periodic thread;
     private FileFilter filter;
-    public boolean initIsRotate = false;
     private boolean isDirExist;
     private boolean flags = false;
 
@@ -78,38 +77,6 @@ public class DirWatcher {
         // waiting for thread to complete.
         LOG.info("Stopped dir watcher thread");
         thread = null;
-    }
-
-    /**
-     * This thread periodically checks a directory for updates
-     */
-    class Periodic extends Thread {
-        Periodic() {
-            super("DirWatcher");
-        }
-
-        boolean isExit = false;
-
-        public void run() {
-            try {
-
-                LOG.info("DirWatcher start watching dir:" + dir);
-
-                while (!done) {
-                    try {
-                        isExit = check();
-                        Clock.sleep(sleep_ms);
-                    } catch (NumberFormatException nfe) {
-                        LOG.warn("wtf ", nfe);
-                    }
-                }
-            } catch (InterruptedException e) {
-                LOG.warn("Maybe dir: " + dir + " is not exists");
-                LOG.warn("InterruptedException:",e);
-            }
-
-            LOG.debug("exit dirwatchthread");
-        }
     }
 
     /**
@@ -185,7 +152,7 @@ public class DirWatcher {
         DirChangeHandler[] hs = list.toArray(new DirChangeHandler[0]);
         for (DirChangeHandler h : hs) {
             h.fileCreated(f);
-            LOG.info("fireCreatedFile:"+f.getAbsolutePath());
+            LOG.info("fireCreatedFile:" + f.getAbsolutePath());
         }
 
     }
@@ -198,11 +165,43 @@ public class DirWatcher {
         DirChangeHandler[] hs = list.toArray(new DirChangeHandler[0]);
         for (DirChangeHandler h : hs) {
             h.fileDeleted(f);
-            LOG.info("fireDeletedFile:"+f.getAbsolutePath());
+            LOG.info("fireDeletedFile:" + f.getAbsolutePath());
         }
     }
 
     public boolean isFlags() {
         return flags;
+    }
+
+    /**
+     * This thread periodically checks a directory for updates
+     */
+    class Periodic extends Thread {
+        boolean isExit = false;
+
+        Periodic() {
+            super("DirWatcher");
+        }
+
+        public void run() {
+            try {
+
+                LOG.info("DirWatcher start watching dir:" + dir);
+
+                while (!done) {
+                    try {
+                        isExit = check();
+                        Clock.sleep(sleep_ms);
+                    } catch (NumberFormatException nfe) {
+                        LOG.warn("wtf ", nfe);
+                    }
+                }
+            } catch (InterruptedException e) {
+                LOG.warn("Maybe dir: " + dir + " is not exists");
+                LOG.warn("InterruptedException:", e);
+            }
+
+            LOG.debug("exit dirwatchthread");
+        }
     }
 }

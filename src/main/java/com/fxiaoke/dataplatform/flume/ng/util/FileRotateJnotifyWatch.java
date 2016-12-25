@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,47 +26,45 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class FileRotateJnotifyWatch extends Thread {
     static final Logger LOG = LoggerFactory.getLogger(FileJnotifyWatch.class);
-    private String path ;
+    static final String regex = "(?:\\.|_)?\\d{4}-\\d{2}-\\d{2}.*";
+    static final String separator = System.getProperty("file.separator");
+    public static Set<String> fileSet = new ConcurrentHashSet<String>();
+    private String path;
     private String confPath;
 
-    static final String  regex="(?:\\.|_)?\\d{4}-\\d{2}-\\d{2}.*";
-    static final String separator = System.getProperty("file.separator");
-
-    public FileRotateJnotifyWatch(String path,String confPath) {
+    public FileRotateJnotifyWatch(String path, String confPath) {
         this.path = path;
         this.confPath = confPath;
     }
-    public  static Set<String> fileSet = new ConcurrentHashSet<String>();
 
-    public static List<String> setWatchDir(String watchConf) throws IOException{
-        ArrayList<String> watchDirs=new ArrayList<String>();
+    public static List<String> setWatchDir(String watchConf) throws IOException {
+        ArrayList<String> watchDirs = new ArrayList<String>();
 
 
-        File  fileName=new File(watchConf);
-        if(!fileName.exists()){
-            LOG.warn("watchConf not exists :"+watchConf);
+        File fileName = new File(watchConf);
+        if (!fileName.exists()) {
+            LOG.warn("watchConf not exists :" + watchConf);
             return watchDirs;
         }
 
-        FileInputStream file=new FileInputStream(fileName);
+        FileInputStream file = new FileInputStream(fileName);
         BufferedReader reader;
         reader = new BufferedReader(new InputStreamReader(file));
         String watchField = reader.readLine();
-        File watchDir=null;
-        while(watchField != null){
-            watchField=watchField.trim();
+        File watchDir = null;
+        while (watchField != null) {
+            watchField = watchField.trim();
 
-            if(!watchField.startsWith("#")){
-                watchDir=new File(watchField);
-                if(!watchDir.exists()){
-                    LOG.warn("watchDir not exists :"+watchField);
-                }else if(!watchDir.isDirectory()){
-                    LOG.warn("watchDir is not a directory :"+watchField);
-                }else {
+            if (!watchField.startsWith("#")) {
+                watchDir = new File(watchField);
+                if (!watchDir.exists()) {
+                    LOG.warn("watchDir not exists :" + watchField);
+                } else if (!watchDir.isDirectory()) {
+                    LOG.warn("watchDir is not a directory :" + watchField);
+                } else {
                     watchDirs.add(watchField);
                 }
             }
@@ -127,22 +125,34 @@ public class FileRotateJnotifyWatch extends Thread {
                     init(file.getAbsolutePath());
                 } else {
                     if (file.getAbsolutePath().matches(".*\\d{4}-\\d{2}-\\d{2}-\\d{2}.*")) {
-                        fileAdd=file.getParent()+separator+file.getName().replaceAll(regex,"");
+                        fileAdd = file.getParent() + separator + file.getName().replaceAll(regex, "");
                         fileSet.add(fileAdd);
                     }
                 }
             }
         }
     }
+
+    public static void watchServiced(String path, final String confPath) {
+        FileRotateJnotifyWatch thread = new FileRotateJnotifyWatch(path, confPath);
+        thread.start();
+    }
+
+    public static void main(String[] args) throws Exception {
+        if (args.length == 2) {
+            watchServiced(args[0], args[1]);
+        }
+    }
+
     public void run() {
         try {
-            List<String>  watchDirs=setWatchDir(path);
+            List<String> watchDirs = setWatchDir(path);
 
-            if(watchDirs.size()==0){
+            if (watchDirs.size() == 0) {
                 LOG.warn("#############watchDir is null################");
                 return;
             }
-            for(String watchDir:watchDirs) {
+            for (String watchDir : watchDirs) {
                 init(watchDir);
             }
 
@@ -153,9 +163,9 @@ public class FileRotateJnotifyWatch extends Thread {
             }
             LOG.info("init configure file");
             //WriteConf.writeFlumeConf(fileSet, confPath);
-            WriteFlumeConf.writeConf(fileSet,confPath);
+            WriteFlumeConf.writeConf(fileSet, confPath);
             // 监听事件
-            for(String watchDir:watchDirs) {
+            for (String watchDir : watchDirs) {
                 JNotify.addWatch(watchDir, JNotify.FILE_ANY, true, new JNotifyListener() {
                     @Override
                     public void fileRenamed(int wd, String rootPath, String oldName,
@@ -181,7 +191,7 @@ public class FileRotateJnotifyWatch extends Thread {
                                     LOG.info("recreate configure file");
                                     try {
                                         //WriteConf.writeFlumeConf(fileSet, confPath);
-                                        WriteFlumeConf.writeConf(fileSet,confPath);
+                                        WriteFlumeConf.writeConf(fileSet, confPath);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -205,8 +215,8 @@ public class FileRotateJnotifyWatch extends Thread {
                         String fullPath = rootPath + separator + fileName;
                         LOG.info(fullPath);
                         File folder = new File(fullPath);
-                        if (folder.isFile()&&fullPath.matches(".*\\d{4}-\\d{2}-\\d{2}-\\d{2}.*")) {
-                            fullPath=rootPath+separator+fileName.replaceAll(regex,"");
+                        if (folder.isFile() && fullPath.matches(".*\\d{4}-\\d{2}-\\d{2}-\\d{2}.*")) {
+                            fullPath = rootPath + separator + fileName.replaceAll(regex, "");
                             if (!fileSet.contains(fullPath)) {
                                 fileSet.add(fullPath);
                                 LOG.info("addFile：" + fullPath);
@@ -217,7 +227,7 @@ public class FileRotateJnotifyWatch extends Thread {
                                 LOG.info("recreate configure file");
                                 try {
                                     //WriteConf.writeFlumeConf(fileSet, confPath);
-                                    WriteFlumeConf.writeConf(fileSet,confPath);
+                                    WriteFlumeConf.writeConf(fileSet, confPath);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -236,15 +246,6 @@ public class FileRotateJnotifyWatch extends Thread {
         }
 
 
-    }
-    public static void watchServiced(String path,final String confPath) {
-        FileRotateJnotifyWatch thread = new FileRotateJnotifyWatch(path,confPath);
-        thread.start();
-    }
-    public static void main(String[] args) throws Exception {
-        if(args.length == 2) {
-            watchServiced(args[0],args[1]);
-        }
     }
 }
 

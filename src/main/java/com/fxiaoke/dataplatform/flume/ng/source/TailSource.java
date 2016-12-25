@@ -1,6 +1,9 @@
 package com.fxiaoke.dataplatform.flume.ng.source;
 
-import com.fxiaoke.dataplatform.flume.ng.util.*;
+import com.fxiaoke.dataplatform.flume.ng.util.Clock;
+import com.fxiaoke.dataplatform.flume.ng.util.Cursor;
+import com.fxiaoke.dataplatform.flume.ng.util.CursorType;
+import com.fxiaoke.dataplatform.flume.ng.util.PersistOffset;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.apache.flume.Context;
@@ -24,38 +27,31 @@ import java.util.regex.Pattern;
 /**
  * 以tailf方式读取指定文件内容
  */
-public class TailSource extends AbstractSource implements EventDrivenSource,        Configurable {
+public class TailSource extends AbstractSource implements EventDrivenSource, Configurable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TailSource.class);
     public static final String A_TAILSRCFILE = "tailSrcFile";
-    private boolean isRotate = false;
-
+    private static final Logger LOG = LoggerFactory.getLogger(TailSource.class);
+    public static String hostname;
+    public static int lockTimeOut = 0;
+    private static int thdCount = 0;
+    final List<Cursor> cursors = new ArrayList<Cursor>();
+    private final List<Cursor> newCursors = new ArrayList<Cursor>();
+    private final List<Cursor> rmCursors = new ArrayList<Cursor>();
     public long historyFileMod;
     public long historyChannelPos;
     public long historyChannelSize;
     public long historylineNumber;
+    ChannelProcessor channelProcessor;
+    private boolean isRotate = false;
     private String logicalNode;
     private String persistDir;
-
     private String rotateRegex;
     private Pattern rotatePattern;
     private String runMode = "tail";
-
-    ChannelProcessor channelProcessor;
-    private static int thdCount = 0;
     private volatile boolean done = false;
-
     private Set<String> offSet = new HashSet<String>();
-
     private long sleepTime = 100; //毫秒
-    final List<Cursor> cursors = new ArrayList<Cursor>();
-    private final List<Cursor> newCursors = new ArrayList<Cursor>();
-    private final List<Cursor> rmCursors = new ArrayList<Cursor>();
-
     private TailThread thd = null;
-
-    public static String hostname;
-
     private File file;
     private long fileLen;
     private boolean startFromEnd;
@@ -63,7 +59,6 @@ public class TailSource extends AbstractSource implements EventDrivenSource,    
     private boolean flags = false;
     private int bufferSize;
     private long checkPersistTime;
-    public static int lockTimeOut = 0;
     private boolean isRemoveCursor = false;
     private long maxNoChangeTime;
     private SourceCounter sourceCounter;
@@ -72,7 +67,7 @@ public class TailSource extends AbstractSource implements EventDrivenSource,    
     private long rotateInterval = 0;
     private CursorType cursorType;
     private String persistCopyModel;
-    private boolean isPersist=true;
+    private boolean isPersist = true;
 
     public TailSource() {
         LOG.info("Starting TailSource.....");
@@ -128,7 +123,7 @@ public class TailSource extends AbstractSource implements EventDrivenSource,    
             throw new IllegalStateException("Attempted to open tail source twice!");
         }
 
-            rotatePattern = Pattern.compile(rotateRegex);
+        rotatePattern = Pattern.compile(rotateRegex);
 
         if (flags) {
             long readOffset = startFromEnd ? fileLen : offset;
@@ -138,25 +133,24 @@ public class TailSource extends AbstractSource implements EventDrivenSource,    
             channelProcessor = getChannelProcessor();
 
 
-
-        if (startFromEnd) {
-            c = new Cursor(channelProcessor, file, readOffset, readOffset, file.lastModified(),
-                    rotateRegex, persistAbsPath, bufferSize, checkPersistTime, sourceCounter,
-                    isRotateEnable, rotateInterval, cursorType, persistCopyModel);
-        } else {
-            c = new Cursor(channelProcessor, file, rotateRegex, persistAbsPath, bufferSize,
-                    checkPersistTime, sourceCounter, isRotateEnable, rotateInterval, cursorType,
-                    persistCopyModel);
-        }
+            if (startFromEnd) {
+                c = new Cursor(channelProcessor, file, readOffset, readOffset, file.lastModified(),
+                        rotateRegex, persistAbsPath, bufferSize, checkPersistTime, sourceCounter,
+                        isRotateEnable, rotateInterval, cursorType, persistCopyModel);
+            } else {
+                c = new Cursor(channelProcessor, file, rotateRegex, persistAbsPath, bufferSize,
+                        checkPersistTime, sourceCounter, isRotateEnable, rotateInterval, cursorType,
+                        persistCopyModel);
+            }
 
             addCursor(c, true);
         }
 
-        
+
         if (runMode != null && runMode.equals("tail")) {
             recover();
         }
-        
+
 
         thd = new TailThread();
         thd.start();
@@ -206,6 +200,125 @@ public class TailSource extends AbstractSource implements EventDrivenSource,    
             LOG.debug("########hostname is: " + hostname);
 
         }
+    }
+
+    public void setRotateRegex(String regx) {
+        rotateRegex = regx;
+    }
+
+    public void setMode(String m) {
+        runMode = m;
+    }
+
+    public void setHistoryFileMod(long historyFileMod) {
+        this.historyFileMod = historyFileMod;
+    }
+
+    public long getHistoryChannelPos() {
+        return historyChannelPos;
+    }
+
+    public void setHistoryChannelPos(long historyChannelPos) {
+        this.historyChannelPos = historyChannelPos;
+    }
+
+    public long getHistoryChannelSize() {
+        return historyChannelSize;
+    }
+
+    public void setHistoryChannelSize(long historyChannelSize) {
+        this.historyChannelSize = historyChannelSize;
+    }
+
+    public long getHistorylineNumber() {
+        return historylineNumber;
+    }
+
+    public void setHistorylineNumber(long historylineNumber) {
+        this.historylineNumber = historylineNumber;
+    }
+
+    public void setLogicalNode(String name) {
+        logicalNode = name;
+    }
+
+    public void recover() {
+        Map<String, List<Long>> offsetMap = PersistOffset.getOffsetMap(persistAbsPath);
+        if (offsetMap.size() == 0) {
+            return;
+        }
+        DateFormat dateFormat = new SimpleDateFormat("HH");
+        String persistHour;
+        String nowHour = dateFormat.format(System.currentTimeMillis());
+
+        for (Cursor c : cursors) {
+            String fname = c.file.getName();
+            List<Long> list = offsetMap.get(fname);
+            if (list == null) {
+                continue;
+            }
+            long offset = list.get(0);
+            long lineNumber = list.get(1);
+            persistHour = dateFormat.format(new File(persistAbsPath).lastModified());
+
+
+            if (offset > c.file.length()) {
+                LOG.warn("maybe file rotate,offset>file.length()");
+                continue;
+            }
+
+            if (!persistHour.equals(nowHour)) {
+                LOG.warn(String.format("maybe file rotate,persistHour change from %s to %s", persistHour, nowHour));
+                continue;
+            }
+
+            LOG.info(String.format("recover file:%s offset:%s lineNumber:%s", fname, offset, lineNumber));
+            c.setLastChannelPos(offset);
+            c.setLastChannelSize(offset);
+            c.setLineNumber(lineNumber);
+        }
+
+
+    }
+
+    synchronized public void addCursor(Cursor cursor, boolean flags) {
+        Preconditions.checkArgument(cursor != null);
+
+        if (thd == null) {
+            cursors.add(cursor);
+            LOG.info("Unstarted Tail has added cursor: " + cursor.file);
+        } else {
+            while (!Strings.isNullOrEmpty(rotateRegex) && !isRotate && !flags) {
+                try {
+                    Clock.sleep(sleepTime);
+                    LOG.debug("Sleep while isRotate is false..");
+                } catch (InterruptedException e) {
+                    LOG.warn("Sleep InterruptedException: {}", e.getMessage());
+                }
+            }
+
+            synchronized (newCursors) {
+                newCursors.add(cursor);
+            }
+            LOG.info("Tail added new cursor to new cursor list: " + cursor.file);
+        }
+
+    }
+
+    synchronized public void removeCursor(Cursor cursor) {
+        Preconditions.checkArgument(cursor != null);
+
+        LOG.info("Tail added rm cursor to rmCursors: " + cursor.file);
+
+        if (thd == null) {
+            cursors.remove(cursor);
+        } else {
+
+            synchronized (rmCursors) {
+                rmCursors.add(cursor);
+            }
+        }
+
     }
 
     class TailThread extends Thread {
@@ -313,9 +426,9 @@ public class TailSource extends AbstractSource implements EventDrivenSource,    
 
                         int rt = c.tailBody();
 
-			if(rt>0){
-				isPersist=true;
-			}
+                        if (rt > 0) {
+                            isPersist = true;
+                        }
 
                         if (rt == 1) {
                             madeProgress = 1;
@@ -353,13 +466,13 @@ public class TailSource extends AbstractSource implements EventDrivenSource,    
 
                     if (madeProgress == 0) {
                         Clock.sleep(sleepTime);
-			if(isPersist){
-                    		for (Cursor c : cursors) {
-					c.persistOffset("updateMap",true);
-				}
+                        if (isPersist) {
+                            for (Cursor c : cursors) {
+                                c.persistOffset("updateMap", true);
+                            }
 
-				isPersist=false;
-			}
+                            isPersist = false;
+                        }
                     }
                 }
                 LOG.warn("Tail got done flag");
@@ -376,125 +489,5 @@ public class TailSource extends AbstractSource implements EventDrivenSource,    
             }
 
         }
-    }
-
-    public void setRotateRegex(String regx) {
-        rotateRegex = regx;
-    }
-
-    public void setMode(String m) {
-        runMode = m;
-    }
-
-    public void setHistoryFileMod(long historyFileMod) {
-        this.historyFileMod = historyFileMod;
-    }
-
-    public long getHistoryChannelPos() {
-        return historyChannelPos;
-    }
-
-    public void setHistoryChannelPos(long historyChannelPos) {
-        this.historyChannelPos = historyChannelPos;
-    }
-
-    public long getHistoryChannelSize() {
-        return historyChannelSize;
-    }
-
-    public void setHistoryChannelSize(long historyChannelSize) {
-        this.historyChannelSize = historyChannelSize;
-    }
-
-    public long getHistorylineNumber() {
-        return historylineNumber;
-    }
-
-    public void setHistorylineNumber(long historylineNumber) {
-        this.historylineNumber = historylineNumber;
-    }
-
-    public void setLogicalNode(String name) {
-        logicalNode = name;
-    }
-
-    public void recover() {
-        Map<String, List<Long>> offsetMap = PersistOffset.getOffsetMap(persistAbsPath);
-        if (offsetMap.size() == 0) {
-            return;
-        }
-	    DateFormat dateFormat = new SimpleDateFormat("HH");
-	    String persistHour;
-        String nowHour=dateFormat.format(System.currentTimeMillis());
-
-        for (Cursor c : cursors) {
-            String fname = c.file.getName();
-            List<Long> list = offsetMap.get(fname);
-            if (list == null) {
-                continue;
-            }
-            long offset = list.get(0);
-            long lineNumber = list.get(1);
-            persistHour= dateFormat.format(new File(persistAbsPath).lastModified()); 
-
-
-            if (offset > c.file.length()) {
-                LOG.warn("maybe file rotate,offset>file.length()");
-                continue;
-            }
-
-            if (!persistHour.equals(nowHour)) {
-                LOG.warn(String.format("maybe file rotate,persistHour change from %s to %s",persistHour,nowHour));
-                continue;
-            }
-
-            LOG.info(String.format("recover file:%s offset:%s lineNumber:%s", fname, offset, lineNumber));
-            c.setLastChannelPos(offset);
-            c.setLastChannelSize(offset);
-            c.setLineNumber(lineNumber);
-        }
-
-
-    }
-
-
-    synchronized public void addCursor(Cursor cursor, boolean flags) {
-        Preconditions.checkArgument(cursor != null);
-
-        if (thd == null) {
-            cursors.add(cursor);
-            LOG.info("Unstarted Tail has added cursor: " + cursor.file);
-        } else {
-            while (!Strings.isNullOrEmpty(rotateRegex) && !isRotate && !flags) {
-                try {
-                    Clock.sleep(sleepTime);
-                    LOG.debug("Sleep while isRotate is false..");
-                } catch (InterruptedException e) {
-                    LOG.warn("Sleep InterruptedException: {}", e.getMessage());
-                }
-            }
-
-            synchronized (newCursors) {
-                newCursors.add(cursor);
-            }
-            LOG.info("Tail added new cursor to new cursor list: " + cursor.file);
-        }
-
-    }
-
-    synchronized public void removeCursor(Cursor cursor) {
-        Preconditions.checkArgument(cursor != null);
-
-        LOG.info("Tail added rm cursor to rmCursors: " + cursor.file);
-
-        if (thd == null) {
-            cursors.remove(cursor);
-        } else {
-
-            synchronized (rmCursors) {
-                rmCursors.add(cursor);
-            }
-        }
-
     }
 }

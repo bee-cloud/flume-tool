@@ -248,21 +248,21 @@ public class PersistOffset {
             Thread.currentThread().interrupt();
         }
         return false;
-}
+    }
 
     private static void unlockExclusive() {
         checkpointWriterLock.unlock();
     }
 
     static boolean tryLockShared() {
-      try {
+        try {
             return checkpointReadLock.tryLock(TailSource.lockTimeOut, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ex) {
             LOG.warn("Interrupted while waiting for log shared lock", ex);
             Thread.currentThread().interrupt();
         }
         return false;
-  }
+    }
 
     static void unlockShared() {
         checkpointReadLock.unlock();

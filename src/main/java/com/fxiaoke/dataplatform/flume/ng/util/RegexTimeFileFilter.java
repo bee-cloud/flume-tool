@@ -13,29 +13,24 @@ import java.util.regex.Pattern;
  */
 public class RegexTimeFileFilter implements FileFilter {
     static final Logger LOG = LoggerFactory.getLogger(RegexTimeFileFilter.class);
+    long timestampStart;
+    long timestampEnd;
+    long fileTimestamp;
     private Pattern p;
-
     private String interval;
     private String filterDateStart;
     private String filterDateEnd;
-
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
     private String timeReg;
     private String timeFormat;
 
-    long timestampStart;
-    long timestampEnd;
-
-    long fileTimestamp;
-
-    public RegexTimeFileFilter(String regex, String interval, String filterDateStart, String filterDateEnd,String timeReg,String timeFormat) {
+    public RegexTimeFileFilter(String regex, String interval, String filterDateStart, String filterDateEnd, String timeReg, String timeFormat) {
         this.p = Pattern.compile(regex);
         this.interval = interval;
         this.filterDateStart = filterDateStart;
         this.filterDateEnd = filterDateEnd;
-        this.timeReg=timeReg;
-        this.timeFormat=timeFormat;
+        this.timeReg = timeReg;
+        this.timeFormat = timeFormat;
 
         LOG.debug("regex:" + regex);
 
@@ -52,8 +47,8 @@ public class RegexTimeFileFilter implements FileFilter {
         boolean isMatch = p.matcher(f.getName()).matches();
         boolean rb;
 
-        timestampStart=0;
-        timestampEnd=0;
+        timestampStart = 0;
+        timestampEnd = 0;
 
         if (!isMatch) {
             return false;
@@ -62,7 +57,7 @@ public class RegexTimeFileFilter implements FileFilter {
         try {
             if (!filterDateStart.equals("")) {
                 timestampStart = formatter.parse(filterDateStart).getTime();
-            }else{
+            } else {
                 return true;
             }
 
@@ -75,7 +70,7 @@ public class RegexTimeFileFilter implements FileFilter {
                 }
             }
 
-            fileTimestamp = Tools.getFileTimestamp(f.getAbsolutePath(),timeReg, timeFormat);
+            fileTimestamp = Tools.getFileTimestamp(f.getAbsolutePath(), timeReg, timeFormat);
 
             LOG.debug("fileTimestamp:" + fileTimestamp);
             LOG.debug("timestampStart:" + timestampStart);
@@ -101,7 +96,7 @@ public class RegexTimeFileFilter implements FileFilter {
                 rb = true;
             }
         } catch (ParseException e) {
-            LOG.warn("fileSelect error:",e);
+            LOG.warn("fileSelect error:", e);
             return false;
         }
 

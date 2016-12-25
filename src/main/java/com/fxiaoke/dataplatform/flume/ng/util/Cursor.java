@@ -22,28 +22,28 @@ import java.util.Map;
 public class Cursor {
     private static final Logger LOG = LoggerFactory.getLogger(Cursor.class);
     public final File file;
+    private final String rotateRegex;
+    public ReadComplete readComplete = ReadComplete.NO;
+    protected ChannelProcessor channelProcessor;
+    protected long lastChannelPos;
+    protected long allBufNum = 0;
+    protected long lineNumber = 0;
+    protected int maxBackoffSleep = 1000;
+    protected boolean isRotateEnable;
+    protected long rotateInterval;
+    protected long lastStopTime = 0;
     ByteBuffer buf;
     FxiaokeRandomAccessFile raf = null;
     FileChannel in = null;
-    protected ChannelProcessor channelProcessor;
     private long lastFileMod;
-    protected long lastChannelPos;
     private long lastChannelSize;
     private int readFailures;
-    protected long allBufNum = 0;
     private long lastPersist = 0;
-    private final String rotateRegex;
-    protected long lineNumber = 0;
     private String persistAbsPath;
-    protected int maxBackoffSleep = 1000;
     private long checkPersistTime;
     private boolean isClosed = false;
     private boolean unChanged = false;
     private SourceCounter sourceCounter;
-    protected boolean isRotateEnable;
-    protected long rotateInterval;
-    protected long lastStopTime = 0;
-    public ReadComplete readComplete = ReadComplete.NO;
     private CursorType cursorType;
     private String persistCopyModel;
 
@@ -109,12 +109,12 @@ public class Cursor {
         return lastChannelPos;
     }
 
-    public long getLastChannelSize() {
-        return lastChannelSize;
-    }
-
     public void setLastChannelPos(long pos) {
         lastChannelPos = pos;
+    }
+
+    public long getLastChannelSize() {
+        return lastChannelSize;
     }
 
     public void setLastChannelSize(long pos) {
@@ -256,7 +256,7 @@ public class Cursor {
                     + lastChannelSize);
             return true;
         } catch (FileNotFoundException fnfe) {
-            LOG.debug("Tail '" + file+ "': a file existed then disappeared, odd but continue");
+            LOG.debug("Tail '" + file + "': a file existed then disappeared, odd but continue");
             return false;
         }
     }
@@ -354,7 +354,7 @@ public class Cursor {
             }
 
             if (flen == lastChannelSize && fmod == lastFileMod) {
-              //  LOG.debug("tail " + file + " : no change");
+                //  LOG.debug("tail " + file + " : no change");
                 if (!unChanged) {
                     persistOffset("updateMap", false);
                     unChanged = true;
@@ -472,15 +472,15 @@ public class Cursor {
         return EventBuilder.withBody(body, headers);
     }
 
-    public enum ReadComplete {
-        YES, NO
-    }
-
     @Override
     public String toString() {
         return "Cursor{" +
                 "file=" + file.getName() +
                 '}';
+    }
+
+    public enum ReadComplete {
+        YES, NO
     }
 
 }

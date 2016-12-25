@@ -1,6 +1,53 @@
 package com.fxiaoke.dataplatform.flume.ng.util.proto;
 
 public final class Offset {
+    private static com.google.protobuf.Descriptors.Descriptor
+            internal_static_flume_dataSet_descriptor;
+    private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+            internal_static_flume_dataSet_fieldAccessorTable;
+    private static com.google.protobuf.Descriptors.Descriptor
+            internal_static_flume_offsetKv_descriptor;
+    private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+            internal_static_flume_offsetKv_fieldAccessorTable;
+    private static com.google.protobuf.Descriptors.FileDescriptor
+            descriptor;
+
+    static {
+        String[] descriptorData = {
+                "\n\014OffSet.proto\022\005flume\":\n\007dataSet\022\035\n\004kmap" +
+                        "\030\001 \003(\0132\017.flume.offsetKv\022\020\n\010isRotate\030\002 \001(" +
+                        "\010\"@\n\010offsetKv\022\020\n\010filename\030\001 \002(\t\022\016\n\006offse" +
+                        "t\030\002 \002(\020\022\022\n\nlineNumber\030\003 \002(\020B!\n\027com.cloud" +
+                        "era.util.protoB\006Offset"
+        };
+        com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+                new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+                    public com.google.protobuf.ExtensionRegistry assignDescriptors(
+                            com.google.protobuf.Descriptors.FileDescriptor root) {
+                        descriptor = root;
+                        internal_static_flume_dataSet_descriptor =
+                                getDescriptor().getMessageTypes().get(0);
+                        internal_static_flume_dataSet_fieldAccessorTable = new
+                                com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+                                internal_static_flume_dataSet_descriptor,
+                                new String[]{"Kmap", "IsRotate",});
+                        internal_static_flume_offsetKv_descriptor =
+                                getDescriptor().getMessageTypes().get(1);
+                        internal_static_flume_offsetKv_fieldAccessorTable = new
+                                com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+                                internal_static_flume_offsetKv_descriptor,
+                                new String[]{"Filename", "Offset", "LineNumber",});
+                        return null;
+                    }
+                };
+        com.google.protobuf.Descriptors.FileDescriptor
+                .internalBuildGeneratedFileFrom(descriptorData,
+                        new com.google.protobuf.Descriptors.FileDescriptor[]{
+                        }, assigner);
+    }
+
     private Offset() {
     }
 
@@ -8,6 +55,10 @@ public final class Offset {
             com.google.protobuf.ExtensionRegistry registry) {
     }
 
+    public static com.google.protobuf.Descriptors.FileDescriptor
+    getDescriptor() {
+        return descriptor;
+    }
     public interface dataSetOrBuilder
             extends com.google.protobuf.MessageOrBuilder {
 
@@ -54,40 +105,94 @@ public final class Offset {
         boolean getIsRotate();
     }
 
+    public interface offsetKvOrBuilder
+            extends com.google.protobuf.MessageOrBuilder {
+
+        // required string filename = 1;
+
+        /**
+         * <code>required string filename = 1;</code>
+         */
+        boolean hasFilename();
+
+        /**
+         * <code>required string filename = 1;</code>
+         */
+        String getFilename();
+
+        /**
+         * <code>required string filename = 1;</code>
+         */
+        com.google.protobuf.ByteString
+        getFilenameBytes();
+
+        // required sfixed64 offset = 2;
+
+        /**
+         * <code>required sfixed64 offset = 2;</code>
+         */
+        boolean hasOffset();
+
+        /**
+         * <code>required sfixed64 offset = 2;</code>
+         */
+        long getOffset();
+
+        // required sfixed64 lineNumber = 3;
+
+        /**
+         * <code>required sfixed64 lineNumber = 3;</code>
+         */
+        boolean hasLineNumber();
+
+        /**
+         * <code>required sfixed64 lineNumber = 3;</code>
+         */
+        long getLineNumber();
+    }
+
     /**
      * Protobuf type {@code flume.dataSet}
      */
     public static final class dataSet extends
             com.google.protobuf.GeneratedMessage
             implements dataSetOrBuilder {
+        // repeated .flume.offsetKv kmap = 1;
+        public static final int KMAP_FIELD_NUMBER = 1;
+        // optional bool isRotate = 2;
+        public static final int ISROTATE_FIELD_NUMBER = 2;
+        private static final dataSet defaultInstance;
+        private static final long serialVersionUID = 0L;
+        public static com.google.protobuf.Parser<dataSet> PARSER =
+                new com.google.protobuf.AbstractParser<dataSet>() {
+                    public dataSet parsePartialFrom(
+                            com.google.protobuf.CodedInputStream input,
+                            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                            throws com.google.protobuf.InvalidProtocolBufferException {
+                        return new dataSet(input, extensionRegistry);
+                    }
+                };
+
+        static {
+            defaultInstance = new dataSet(true);
+            defaultInstance.initFields();
+        }
+
+        private final com.google.protobuf.UnknownFieldSet unknownFields;
+        private int bitField0_;
+        private java.util.List<offsetKv> kmap_;
+        private boolean isRotate_;
+        private byte memoizedIsInitialized = -1;
+        private int memoizedSerializedSize = -1;
+
         // Use dataSet.newBuilder() to construct.
         private dataSet(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
             super(builder);
             this.unknownFields = builder.getUnknownFields();
         }
-
         private dataSet(boolean noInit) {
             this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
         }
-
-        private static final dataSet defaultInstance;
-
-        public static dataSet getDefaultInstance() {
-            return defaultInstance;
-        }
-
-        public dataSet getDefaultInstanceForType() {
-            return defaultInstance;
-        }
-
-        private final com.google.protobuf.UnknownFieldSet unknownFields;
-
-        @Override
-        public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-            return this.unknownFields;
-        }
-
         private dataSet(
                 com.google.protobuf.CodedInputStream input,
                 com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -140,152 +245,13 @@ public final class Offset {
             }
         }
 
+        public static dataSet getDefaultInstance() {
+            return defaultInstance;
+        }
+
         public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
             return Offset.internal_static_flume_dataSet_descriptor;
-        }
-
-        protected FieldAccessorTable
-        internalGetFieldAccessorTable() {
-            return Offset.internal_static_flume_dataSet_fieldAccessorTable
-                    .ensureFieldAccessorsInitialized(
-                            dataSet.class, Builder.class);
-        }
-
-        public static com.google.protobuf.Parser<dataSet> PARSER =
-                new com.google.protobuf.AbstractParser<dataSet>() {
-                    public dataSet parsePartialFrom(
-                            com.google.protobuf.CodedInputStream input,
-                            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-                            throws com.google.protobuf.InvalidProtocolBufferException {
-                        return new dataSet(input, extensionRegistry);
-                    }
-                };
-
-        @Override
-        public com.google.protobuf.Parser<dataSet> getParserForType() {
-            return PARSER;
-        }
-
-        private int bitField0_;
-        // repeated .flume.offsetKv kmap = 1;
-        public static final int KMAP_FIELD_NUMBER = 1;
-        private java.util.List<offsetKv> kmap_;
-
-        /**
-         * <code>repeated .flume.offsetKv kmap = 1;</code>
-         */
-        public java.util.List<offsetKv> getKmapList() {
-            return kmap_;
-        }
-
-        /**
-         * <code>repeated .flume.offsetKv kmap = 1;</code>
-         */
-        public java.util.List<? extends offsetKvOrBuilder>
-        getKmapOrBuilderList() {
-            return kmap_;
-        }
-
-        /**
-         * <code>repeated .flume.offsetKv kmap = 1;</code>
-         */
-        public int getKmapCount() {
-            return kmap_.size();
-        }
-
-        /**
-         * <code>repeated .flume.offsetKv kmap = 1;</code>
-         */
-        public offsetKv getKmap(int index) {
-            return kmap_.get(index);
-        }
-
-        /**
-         * <code>repeated .flume.offsetKv kmap = 1;</code>
-         */
-        public offsetKvOrBuilder getKmapOrBuilder(
-                int index) {
-            return kmap_.get(index);
-        }
-
-        // optional bool isRotate = 2;
-        public static final int ISROTATE_FIELD_NUMBER = 2;
-        private boolean isRotate_;
-
-        /**
-         * <code>optional bool isRotate = 2;</code>
-         */
-        public boolean hasIsRotate() {
-            return ((bitField0_ & 0x00000001) == 0x00000001);
-        }
-
-        /**
-         * <code>optional bool isRotate = 2;</code>
-         */
-        public boolean getIsRotate() {
-            return isRotate_;
-        }
-
-        private void initFields() {
-            kmap_ = java.util.Collections.emptyList();
-            isRotate_ = false;
-        }
-
-        private byte memoizedIsInitialized = -1;
-
-        public final boolean isInitialized() {
-            byte isInitialized = memoizedIsInitialized;
-            if (isInitialized != -1) return isInitialized == 1;
-
-            for (int i = 0; i < getKmapCount(); i++) {
-                if (!getKmap(i).isInitialized()) {
-                    memoizedIsInitialized = 0;
-                    return false;
-                }
-            }
-            memoizedIsInitialized = 1;
-            return true;
-        }
-
-        public void writeTo(com.google.protobuf.CodedOutputStream output)
-                throws java.io.IOException {
-            getSerializedSize();
-            for (int i = 0; i < kmap_.size(); i++) {
-                output.writeMessage(1, kmap_.get(i));
-            }
-            if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                output.writeBool(2, isRotate_);
-            }
-            getUnknownFields().writeTo(output);
-        }
-
-        private int memoizedSerializedSize = -1;
-
-        public int getSerializedSize() {
-            int size = memoizedSerializedSize;
-            if (size != -1) return size;
-
-            size = 0;
-            for (int i = 0; i < kmap_.size(); i++) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeMessageSize(1, kmap_.get(i));
-            }
-            if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBoolSize(2, isRotate_);
-            }
-            size += getUnknownFields().getSerializedSize();
-            memoizedSerializedSize = size;
-            return size;
-        }
-
-        private static final long serialVersionUID = 0L;
-
-        @Override
-        protected Object writeReplace()
-                throws java.io.ObjectStreamException {
-            return super.writeReplace();
         }
 
         public static dataSet parseFrom(
@@ -354,12 +320,140 @@ public final class Offset {
             return Builder.create();
         }
 
-        public Builder newBuilderForType() {
-            return newBuilder();
-        }
-
         public static Builder newBuilder(dataSet prototype) {
             return newBuilder().mergeFrom(prototype);
+        }
+
+        public dataSet getDefaultInstanceForType() {
+            return defaultInstance;
+        }
+
+        @Override
+        public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+            return this.unknownFields;
+        }
+
+        protected FieldAccessorTable
+        internalGetFieldAccessorTable() {
+            return Offset.internal_static_flume_dataSet_fieldAccessorTable
+                    .ensureFieldAccessorsInitialized(
+                            dataSet.class, Builder.class);
+        }
+
+        @Override
+        public com.google.protobuf.Parser<dataSet> getParserForType() {
+            return PARSER;
+        }
+
+        /**
+         * <code>repeated .flume.offsetKv kmap = 1;</code>
+         */
+        public java.util.List<offsetKv> getKmapList() {
+            return kmap_;
+        }
+
+        /**
+         * <code>repeated .flume.offsetKv kmap = 1;</code>
+         */
+        public java.util.List<? extends offsetKvOrBuilder>
+        getKmapOrBuilderList() {
+            return kmap_;
+        }
+
+        /**
+         * <code>repeated .flume.offsetKv kmap = 1;</code>
+         */
+        public int getKmapCount() {
+            return kmap_.size();
+        }
+
+        /**
+         * <code>repeated .flume.offsetKv kmap = 1;</code>
+         */
+        public offsetKv getKmap(int index) {
+            return kmap_.get(index);
+        }
+
+        /**
+         * <code>repeated .flume.offsetKv kmap = 1;</code>
+         */
+        public offsetKvOrBuilder getKmapOrBuilder(
+                int index) {
+            return kmap_.get(index);
+        }
+
+        /**
+         * <code>optional bool isRotate = 2;</code>
+         */
+        public boolean hasIsRotate() {
+            return ((bitField0_ & 0x00000001) == 0x00000001);
+        }
+
+        /**
+         * <code>optional bool isRotate = 2;</code>
+         */
+        public boolean getIsRotate() {
+            return isRotate_;
+        }
+
+        private void initFields() {
+            kmap_ = java.util.Collections.emptyList();
+            isRotate_ = false;
+        }
+
+        public final boolean isInitialized() {
+            byte isInitialized = memoizedIsInitialized;
+            if (isInitialized != -1) return isInitialized == 1;
+
+            for (int i = 0; i < getKmapCount(); i++) {
+                if (!getKmap(i).isInitialized()) {
+                    memoizedIsInitialized = 0;
+                    return false;
+                }
+            }
+            memoizedIsInitialized = 1;
+            return true;
+        }
+
+        public void writeTo(com.google.protobuf.CodedOutputStream output)
+                throws java.io.IOException {
+            getSerializedSize();
+            for (int i = 0; i < kmap_.size(); i++) {
+                output.writeMessage(1, kmap_.get(i));
+            }
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                output.writeBool(2, isRotate_);
+            }
+            getUnknownFields().writeTo(output);
+        }
+
+        public int getSerializedSize() {
+            int size = memoizedSerializedSize;
+            if (size != -1) return size;
+
+            size = 0;
+            for (int i = 0; i < kmap_.size(); i++) {
+                size += com.google.protobuf.CodedOutputStream
+                        .computeMessageSize(1, kmap_.get(i));
+            }
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                size += com.google.protobuf.CodedOutputStream
+                        .computeBoolSize(2, isRotate_);
+            }
+            size += getUnknownFields().getSerializedSize();
+            memoizedSerializedSize = size;
+            return size;
+        }
+
+        @Override
+        protected Object writeReplace()
+                throws java.io.ObjectStreamException {
+            return super.writeReplace();
+        }
+
+        public Builder newBuilderForType() {
+            return newBuilder();
         }
 
         public Builder toBuilder() {
@@ -379,17 +473,14 @@ public final class Offset {
         public static final class Builder extends
                 com.google.protobuf.GeneratedMessage.Builder<Builder>
                 implements dataSetOrBuilder {
-            public static final com.google.protobuf.Descriptors.Descriptor
-            getDescriptor() {
-                return Offset.internal_static_flume_dataSet_descriptor;
-            }
-
-            protected FieldAccessorTable
-            internalGetFieldAccessorTable() {
-                return Offset.internal_static_flume_dataSet_fieldAccessorTable
-                        .ensureFieldAccessorsInitialized(
-                                dataSet.class, Builder.class);
-            }
+            private int bitField0_;
+            // repeated .flume.offsetKv kmap = 1;
+            private java.util.List<offsetKv> kmap_ =
+                    java.util.Collections.emptyList();
+            private com.google.protobuf.RepeatedFieldBuilder<
+                    offsetKv, offsetKv.Builder, offsetKvOrBuilder> kmapBuilder_;
+            // optional bool isRotate = 2;
+            private boolean isRotate_;
 
             // Construct using com.fxiaoke.dataplatform.flume.ng.util.proto.Offset.dataSet.newBuilder()
             private Builder() {
@@ -402,14 +493,26 @@ public final class Offset {
                 maybeForceBuilderInitialization();
             }
 
-            private void maybeForceBuilderInitialization() {
-                if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-                    getKmapFieldBuilder();
-                }
+            public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+                return Offset.internal_static_flume_dataSet_descriptor;
             }
 
             private static Builder create() {
                 return new Builder();
+            }
+
+            protected FieldAccessorTable
+            internalGetFieldAccessorTable() {
+                return Offset.internal_static_flume_dataSet_fieldAccessorTable
+                        .ensureFieldAccessorsInitialized(
+                                dataSet.class, Builder.class);
+            }
+
+            private void maybeForceBuilderInitialization() {
+                if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+                    getKmapFieldBuilder();
+                }
             }
 
             public Builder clear() {
@@ -540,21 +643,12 @@ public final class Offset {
                 return this;
             }
 
-            private int bitField0_;
-
-            // repeated .flume.offsetKv kmap = 1;
-            private java.util.List<offsetKv> kmap_ =
-                    java.util.Collections.emptyList();
-
             private void ensureKmapIsMutable() {
                 if (!((bitField0_ & 0x00000001) == 0x00000001)) {
                     kmap_ = new java.util.ArrayList<offsetKv>(kmap_);
                     bitField0_ |= 0x00000001;
                 }
             }
-
-            private com.google.protobuf.RepeatedFieldBuilder<
-                    offsetKv, offsetKv.Builder, offsetKvOrBuilder> kmapBuilder_;
 
             /**
              * <code>repeated .flume.offsetKv kmap = 1;</code>
@@ -802,9 +896,6 @@ public final class Offset {
                 return kmapBuilder_;
             }
 
-            // optional bool isRotate = 2;
-            private boolean isRotate_;
-
             /**
              * <code>optional bool isRotate = 2;</code>
              */
@@ -842,58 +933,7 @@ public final class Offset {
             // @@protoc_insertion_point(builder_scope:flume.dataSet)
         }
 
-        static {
-            defaultInstance = new dataSet(true);
-            defaultInstance.initFields();
-        }
-
         // @@protoc_insertion_point(class_scope:flume.dataSet)
-    }
-
-    public interface offsetKvOrBuilder
-            extends com.google.protobuf.MessageOrBuilder {
-
-        // required string filename = 1;
-
-        /**
-         * <code>required string filename = 1;</code>
-         */
-        boolean hasFilename();
-
-        /**
-         * <code>required string filename = 1;</code>
-         */
-        String getFilename();
-
-        /**
-         * <code>required string filename = 1;</code>
-         */
-        com.google.protobuf.ByteString
-        getFilenameBytes();
-
-        // required sfixed64 offset = 2;
-
-        /**
-         * <code>required sfixed64 offset = 2;</code>
-         */
-        boolean hasOffset();
-
-        /**
-         * <code>required sfixed64 offset = 2;</code>
-         */
-        long getOffset();
-
-        // required sfixed64 lineNumber = 3;
-
-        /**
-         * <code>required sfixed64 lineNumber = 3;</code>
-         */
-        boolean hasLineNumber();
-
-        /**
-         * <code>required sfixed64 lineNumber = 3;</code>
-         */
-        long getLineNumber();
     }
 
     /**
@@ -902,6 +942,36 @@ public final class Offset {
     public static final class offsetKv extends
             com.google.protobuf.GeneratedMessage
             implements offsetKvOrBuilder {
+        // required string filename = 1;
+        public static final int FILENAME_FIELD_NUMBER = 1;
+        // required sfixed64 offset = 2;
+        public static final int OFFSET_FIELD_NUMBER = 2;
+        // required sfixed64 lineNumber = 3;
+        public static final int LINENUMBER_FIELD_NUMBER = 3;
+        private static final offsetKv defaultInstance;
+        private static final long serialVersionUID = 0L;
+        public static com.google.protobuf.Parser<offsetKv> PARSER =
+                new com.google.protobuf.AbstractParser<offsetKv>() {
+                    public offsetKv parsePartialFrom(
+                            com.google.protobuf.CodedInputStream input,
+                            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                            throws com.google.protobuf.InvalidProtocolBufferException {
+                        return new offsetKv(input, extensionRegistry);
+                    }
+                };
+
+        static {
+            defaultInstance = new offsetKv(true);
+            defaultInstance.initFields();
+        }
+
+        private final com.google.protobuf.UnknownFieldSet unknownFields;
+        private int bitField0_;
+        private Object filename_;
+        private long offset_;
+        private long lineNumber_;
+        private byte memoizedIsInitialized = -1;
+        private int memoizedSerializedSize = -1;
         // Use offsetKv.newBuilder() to construct.
         private offsetKv(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
             super(builder);
@@ -910,24 +980,6 @@ public final class Offset {
 
         private offsetKv(boolean noInit) {
             this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
-        }
-
-        private static final offsetKv defaultInstance;
-
-        public static offsetKv getDefaultInstance() {
-            return defaultInstance;
-        }
-
-        public offsetKv getDefaultInstanceForType() {
-            return defaultInstance;
-        }
-
-        private final com.google.protobuf.UnknownFieldSet unknownFields;
-
-        @Override
-        public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
-            return this.unknownFields;
         }
 
         private offsetKv(
@@ -981,189 +1033,13 @@ public final class Offset {
             }
         }
 
+        public static offsetKv getDefaultInstance() {
+            return defaultInstance;
+        }
+
         public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
             return Offset.internal_static_flume_offsetKv_descriptor;
-        }
-
-        protected FieldAccessorTable
-        internalGetFieldAccessorTable() {
-            return Offset.internal_static_flume_offsetKv_fieldAccessorTable
-                    .ensureFieldAccessorsInitialized(
-                            offsetKv.class, Builder.class);
-        }
-
-        public static com.google.protobuf.Parser<offsetKv> PARSER =
-                new com.google.protobuf.AbstractParser<offsetKv>() {
-                    public offsetKv parsePartialFrom(
-                            com.google.protobuf.CodedInputStream input,
-                            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-                            throws com.google.protobuf.InvalidProtocolBufferException {
-                        return new offsetKv(input, extensionRegistry);
-                    }
-                };
-
-        @Override
-        public com.google.protobuf.Parser<offsetKv> getParserForType() {
-            return PARSER;
-        }
-
-        private int bitField0_;
-        // required string filename = 1;
-        public static final int FILENAME_FIELD_NUMBER = 1;
-        private Object filename_;
-
-        /**
-         * <code>required string filename = 1;</code>
-         */
-        public boolean hasFilename() {
-            return ((bitField0_ & 0x00000001) == 0x00000001);
-        }
-
-        /**
-         * <code>required string filename = 1;</code>
-         */
-        public String getFilename() {
-            Object ref = filename_;
-            if (ref instanceof String) {
-                return (String) ref;
-            } else {
-                com.google.protobuf.ByteString bs =
-                        (com.google.protobuf.ByteString) ref;
-                String s = bs.toStringUtf8();
-                if (bs.isValidUtf8()) {
-                    filename_ = s;
-                }
-                return s;
-            }
-        }
-
-        /**
-         * <code>required string filename = 1;</code>
-         */
-        public com.google.protobuf.ByteString
-        getFilenameBytes() {
-            Object ref = filename_;
-            if (ref instanceof String) {
-                com.google.protobuf.ByteString b =
-                        com.google.protobuf.ByteString.copyFromUtf8(
-                                (String) ref);
-                filename_ = b;
-                return b;
-            } else {
-                return (com.google.protobuf.ByteString) ref;
-            }
-        }
-
-        // required sfixed64 offset = 2;
-        public static final int OFFSET_FIELD_NUMBER = 2;
-        private long offset_;
-
-        /**
-         * <code>required sfixed64 offset = 2;</code>
-         */
-        public boolean hasOffset() {
-            return ((bitField0_ & 0x00000002) == 0x00000002);
-        }
-
-        /**
-         * <code>required sfixed64 offset = 2;</code>
-         */
-        public long getOffset() {
-            return offset_;
-        }
-
-        // required sfixed64 lineNumber = 3;
-        public static final int LINENUMBER_FIELD_NUMBER = 3;
-        private long lineNumber_;
-
-        /**
-         * <code>required sfixed64 lineNumber = 3;</code>
-         */
-        public boolean hasLineNumber() {
-            return ((bitField0_ & 0x00000004) == 0x00000004);
-        }
-
-        /**
-         * <code>required sfixed64 lineNumber = 3;</code>
-         */
-        public long getLineNumber() {
-            return lineNumber_;
-        }
-
-        private void initFields() {
-            filename_ = "";
-            offset_ = 0L;
-            lineNumber_ = 0L;
-        }
-
-        private byte memoizedIsInitialized = -1;
-
-        public final boolean isInitialized() {
-            byte isInitialized = memoizedIsInitialized;
-            if (isInitialized != -1) return isInitialized == 1;
-
-            if (!hasFilename()) {
-                memoizedIsInitialized = 0;
-                return false;
-            }
-            if (!hasOffset()) {
-                memoizedIsInitialized = 0;
-                return false;
-            }
-            if (!hasLineNumber()) {
-                memoizedIsInitialized = 0;
-                return false;
-            }
-            memoizedIsInitialized = 1;
-            return true;
-        }
-
-        public void writeTo(com.google.protobuf.CodedOutputStream output)
-                throws java.io.IOException {
-            getSerializedSize();
-            if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                output.writeBytes(1, getFilenameBytes());
-            }
-            if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                output.writeSFixed64(2, offset_);
-            }
-            if (((bitField0_ & 0x00000004) == 0x00000004)) {
-                output.writeSFixed64(3, lineNumber_);
-            }
-            getUnknownFields().writeTo(output);
-        }
-
-        private int memoizedSerializedSize = -1;
-
-        public int getSerializedSize() {
-            int size = memoizedSerializedSize;
-            if (size != -1) return size;
-
-            size = 0;
-            if (((bitField0_ & 0x00000001) == 0x00000001)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeBytesSize(1, getFilenameBytes());
-            }
-            if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeSFixed64Size(2, offset_);
-            }
-            if (((bitField0_ & 0x00000004) == 0x00000004)) {
-                size += com.google.protobuf.CodedOutputStream
-                        .computeSFixed64Size(3, lineNumber_);
-            }
-            size += getUnknownFields().getSerializedSize();
-            memoizedSerializedSize = size;
-            return size;
-        }
-
-        private static final long serialVersionUID = 0L;
-
-        @Override
-        protected Object writeReplace()
-                throws java.io.ObjectStreamException {
-            return super.writeReplace();
         }
 
         public static offsetKv parseFrom(
@@ -1232,12 +1108,173 @@ public final class Offset {
             return Builder.create();
         }
 
-        public Builder newBuilderForType() {
-            return newBuilder();
-        }
-
         public static Builder newBuilder(offsetKv prototype) {
             return newBuilder().mergeFrom(prototype);
+        }
+
+        public offsetKv getDefaultInstanceForType() {
+            return defaultInstance;
+        }
+
+        @Override
+        public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+            return this.unknownFields;
+        }
+
+        protected FieldAccessorTable
+        internalGetFieldAccessorTable() {
+            return Offset.internal_static_flume_offsetKv_fieldAccessorTable
+                    .ensureFieldAccessorsInitialized(
+                            offsetKv.class, Builder.class);
+        }
+
+        @Override
+        public com.google.protobuf.Parser<offsetKv> getParserForType() {
+            return PARSER;
+        }
+
+        /**
+         * <code>required string filename = 1;</code>
+         */
+        public boolean hasFilename() {
+            return ((bitField0_ & 0x00000001) == 0x00000001);
+        }
+
+        /**
+         * <code>required string filename = 1;</code>
+         */
+        public String getFilename() {
+            Object ref = filename_;
+            if (ref instanceof String) {
+                return (String) ref;
+            } else {
+                com.google.protobuf.ByteString bs =
+                        (com.google.protobuf.ByteString) ref;
+                String s = bs.toStringUtf8();
+                if (bs.isValidUtf8()) {
+                    filename_ = s;
+                }
+                return s;
+            }
+        }
+
+        /**
+         * <code>required string filename = 1;</code>
+         */
+        public com.google.protobuf.ByteString
+        getFilenameBytes() {
+            Object ref = filename_;
+            if (ref instanceof String) {
+                com.google.protobuf.ByteString b =
+                        com.google.protobuf.ByteString.copyFromUtf8(
+                                (String) ref);
+                filename_ = b;
+                return b;
+            } else {
+                return (com.google.protobuf.ByteString) ref;
+            }
+        }
+
+        /**
+         * <code>required sfixed64 offset = 2;</code>
+         */
+        public boolean hasOffset() {
+            return ((bitField0_ & 0x00000002) == 0x00000002);
+        }
+
+        /**
+         * <code>required sfixed64 offset = 2;</code>
+         */
+        public long getOffset() {
+            return offset_;
+        }
+
+        /**
+         * <code>required sfixed64 lineNumber = 3;</code>
+         */
+        public boolean hasLineNumber() {
+            return ((bitField0_ & 0x00000004) == 0x00000004);
+        }
+
+        /**
+         * <code>required sfixed64 lineNumber = 3;</code>
+         */
+        public long getLineNumber() {
+            return lineNumber_;
+        }
+
+        private void initFields() {
+            filename_ = "";
+            offset_ = 0L;
+            lineNumber_ = 0L;
+        }
+
+        public final boolean isInitialized() {
+            byte isInitialized = memoizedIsInitialized;
+            if (isInitialized != -1) return isInitialized == 1;
+
+            if (!hasFilename()) {
+                memoizedIsInitialized = 0;
+                return false;
+            }
+            if (!hasOffset()) {
+                memoizedIsInitialized = 0;
+                return false;
+            }
+            if (!hasLineNumber()) {
+                memoizedIsInitialized = 0;
+                return false;
+            }
+            memoizedIsInitialized = 1;
+            return true;
+        }
+
+        public void writeTo(com.google.protobuf.CodedOutputStream output)
+                throws java.io.IOException {
+            getSerializedSize();
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                output.writeBytes(1, getFilenameBytes());
+            }
+            if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                output.writeSFixed64(2, offset_);
+            }
+            if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                output.writeSFixed64(3, lineNumber_);
+            }
+            getUnknownFields().writeTo(output);
+        }
+
+        public int getSerializedSize() {
+            int size = memoizedSerializedSize;
+            if (size != -1) return size;
+
+            size = 0;
+            if (((bitField0_ & 0x00000001) == 0x00000001)) {
+                size += com.google.protobuf.CodedOutputStream
+                        .computeBytesSize(1, getFilenameBytes());
+            }
+            if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                size += com.google.protobuf.CodedOutputStream
+                        .computeSFixed64Size(2, offset_);
+            }
+            if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                size += com.google.protobuf.CodedOutputStream
+                        .computeSFixed64Size(3, lineNumber_);
+            }
+            size += getUnknownFields().getSerializedSize();
+            memoizedSerializedSize = size;
+            return size;
+        }
+
+        @Override
+        protected Object writeReplace()
+                throws java.io.ObjectStreamException {
+            return super.writeReplace();
+        }
+
+        public Builder newBuilderForType() {
+            return newBuilder();
         }
 
         public Builder toBuilder() {
@@ -1257,17 +1294,13 @@ public final class Offset {
         public static final class Builder extends
                 com.google.protobuf.GeneratedMessage.Builder<Builder>
                 implements offsetKvOrBuilder {
-            public static final com.google.protobuf.Descriptors.Descriptor
-            getDescriptor() {
-                return Offset.internal_static_flume_offsetKv_descriptor;
-            }
-
-            protected FieldAccessorTable
-            internalGetFieldAccessorTable() {
-                return Offset.internal_static_flume_offsetKv_fieldAccessorTable
-                        .ensureFieldAccessorsInitialized(
-                                offsetKv.class, Builder.class);
-            }
+            private int bitField0_;
+            // required string filename = 1;
+            private Object filename_ = "";
+            // required sfixed64 offset = 2;
+            private long offset_;
+            // required sfixed64 lineNumber = 3;
+            private long lineNumber_;
 
             // Construct using com.fxiaoke.dataplatform.flume.ng.util.proto.Offset.offsetKv.newBuilder()
             private Builder() {
@@ -1280,13 +1313,25 @@ public final class Offset {
                 maybeForceBuilderInitialization();
             }
 
-            private void maybeForceBuilderInitialization() {
-                if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-                }
+            public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+                return Offset.internal_static_flume_offsetKv_descriptor;
             }
 
             private static Builder create() {
                 return new Builder();
+            }
+
+            protected FieldAccessorTable
+            internalGetFieldAccessorTable() {
+                return Offset.internal_static_flume_offsetKv_fieldAccessorTable
+                        .ensureFieldAccessorsInitialized(
+                                offsetKv.class, Builder.class);
+            }
+
+            private void maybeForceBuilderInitialization() {
+                if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+                }
             }
 
             public Builder clear() {
@@ -1402,11 +1447,6 @@ public final class Offset {
                 return this;
             }
 
-            private int bitField0_;
-
-            // required string filename = 1;
-            private Object filename_ = "";
-
             /**
              * <code>required string filename = 1;</code>
              */
@@ -1432,6 +1472,20 @@ public final class Offset {
             /**
              * <code>required string filename = 1;</code>
              */
+            public Builder setFilename(
+                    String value) {
+                if (value == null) {
+                    throw new NullPointerException();
+                }
+                bitField0_ |= 0x00000001;
+                filename_ = value;
+                onChanged();
+                return this;
+            }
+
+            /**
+             * <code>required string filename = 1;</code>
+             */
             public com.google.protobuf.ByteString
             getFilenameBytes() {
                 Object ref = filename_;
@@ -1449,8 +1503,8 @@ public final class Offset {
             /**
              * <code>required string filename = 1;</code>
              */
-            public Builder setFilename(
-                    String value) {
+            public Builder setFilenameBytes(
+                    com.google.protobuf.ByteString value) {
                 if (value == null) {
                     throw new NullPointerException();
                 }
@@ -1469,23 +1523,6 @@ public final class Offset {
                 onChanged();
                 return this;
             }
-
-            /**
-             * <code>required string filename = 1;</code>
-             */
-            public Builder setFilenameBytes(
-                    com.google.protobuf.ByteString value) {
-                if (value == null) {
-                    throw new NullPointerException();
-                }
-                bitField0_ |= 0x00000001;
-                filename_ = value;
-                onChanged();
-                return this;
-            }
-
-            // required sfixed64 offset = 2;
-            private long offset_;
 
             /**
              * <code>required sfixed64 offset = 2;</code>
@@ -1520,9 +1557,6 @@ public final class Offset {
                 onChanged();
                 return this;
             }
-
-            // required sfixed64 lineNumber = 3;
-            private long lineNumber_;
 
             /**
              * <code>required sfixed64 lineNumber = 3;</code>
@@ -1561,65 +1595,7 @@ public final class Offset {
             // @@protoc_insertion_point(builder_scope:flume.offsetKv)
         }
 
-        static {
-            defaultInstance = new offsetKv(true);
-            defaultInstance.initFields();
-        }
-
         // @@protoc_insertion_point(class_scope:flume.offsetKv)
-    }
-
-    private static com.google.protobuf.Descriptors.Descriptor
-            internal_static_flume_dataSet_descriptor;
-    private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-            internal_static_flume_dataSet_fieldAccessorTable;
-    private static com.google.protobuf.Descriptors.Descriptor
-            internal_static_flume_offsetKv_descriptor;
-    private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-            internal_static_flume_offsetKv_fieldAccessorTable;
-
-    public static com.google.protobuf.Descriptors.FileDescriptor
-    getDescriptor() {
-        return descriptor;
-    }
-
-    private static com.google.protobuf.Descriptors.FileDescriptor
-            descriptor;
-
-    static {
-        String[] descriptorData = {
-                "\n\014OffSet.proto\022\005flume\":\n\007dataSet\022\035\n\004kmap" +
-                        "\030\001 \003(\0132\017.flume.offsetKv\022\020\n\010isRotate\030\002 \001(" +
-                        "\010\"@\n\010offsetKv\022\020\n\010filename\030\001 \002(\t\022\016\n\006offse" +
-                        "t\030\002 \002(\020\022\022\n\nlineNumber\030\003 \002(\020B!\n\027com.cloud" +
-                        "era.util.protoB\006Offset"
-        };
-        com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-                new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-                    public com.google.protobuf.ExtensionRegistry assignDescriptors(
-                            com.google.protobuf.Descriptors.FileDescriptor root) {
-                        descriptor = root;
-                        internal_static_flume_dataSet_descriptor =
-                                getDescriptor().getMessageTypes().get(0);
-                        internal_static_flume_dataSet_fieldAccessorTable = new
-                                com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-                                internal_static_flume_dataSet_descriptor,
-                                new String[]{"Kmap", "IsRotate",});
-                        internal_static_flume_offsetKv_descriptor =
-                                getDescriptor().getMessageTypes().get(1);
-                        internal_static_flume_offsetKv_fieldAccessorTable = new
-                                com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-                                internal_static_flume_offsetKv_descriptor,
-                                new String[]{"Filename", "Offset", "LineNumber",});
-                        return null;
-                    }
-                };
-        com.google.protobuf.Descriptors.FileDescriptor
-                .internalBuildGeneratedFileFrom(descriptorData,
-                        new com.google.protobuf.Descriptors.FileDescriptor[]{
-                        }, assigner);
     }
 
     // @@protoc_insertion_point(outer_class_scope)

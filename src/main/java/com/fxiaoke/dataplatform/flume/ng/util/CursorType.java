@@ -9,8 +9,8 @@ public enum CursorType {
     BLOCK("block"),
     LINE("line");
 
-    private final String cursorType;
     private static final Logger LOG = LoggerFactory.getLogger(CursorType.class);
+    private final String cursorType;
 
     private CursorType(String cursorType) {
         this.cursorType = cursorType;

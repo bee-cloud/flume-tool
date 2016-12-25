@@ -6,70 +6,71 @@ import java.util.Date;
 
 
 abstract public class Clock {
-  private static Clock clock = new DefaultClock();
+    private final static DateFormat dateFormat = new SimpleDateFormat(
+            "yyyyMMdd-HHmmssSSSZ");
+    private static Clock clock = new DefaultClock();
 
-  private final static DateFormat dateFormat = new SimpleDateFormat(
-      "yyyyMMdd-HHmmssSSSZ");
-
-  public static String timeStamp() {
-    synchronized(dateFormat) {
-      return dateFormat.format(date());
-    }
-  }
-
-  static class DefaultClock extends Clock {
-
-    @Override
-    public long getNanos() {
-      return System.nanoTime();
+    public static String timeStamp() {
+        synchronized (dateFormat) {
+            return dateFormat.format(date());
+        }
     }
 
-    @Override
-    public long getUnixTime() {
-      return System.currentTimeMillis();
+    public static void resetDefault() {
+        clock = new DefaultClock();
     }
 
-    @Override
-    public Date getDate() {
-      return new Date();
+    ;
+
+    public static void setClock(Clock c) {
+        clock = c;
     }
 
-    @Override
-    public void doSleep(long millis) throws InterruptedException {
-      Thread.sleep(millis);
+    public static long unixTime() {
+        return clock.getUnixTime();
     }
 
-  };
+    public static long nanos() {
+        return clock.getNanos();
+    }
 
-  public static void resetDefault() {
-    clock = new DefaultClock();
-  }
+    public static Date date() {
+        return clock.getDate();
+    }
 
-  public static void setClock(Clock c) {
-    clock = c;
-  }
+    public static void sleep(long millis) throws InterruptedException {
+        clock.doSleep(millis);
+    }
 
-  public static long unixTime() {
-    return clock.getUnixTime();
-  }
+    public abstract long getUnixTime();
 
-  public static long nanos() {
-    return clock.getNanos();
-  }
+    public abstract long getNanos();
 
-  public static Date date() {
-    return clock.getDate();
-  }
+    public abstract Date getDate();
 
-  public static void sleep(long millis) throws InterruptedException {
-    clock.doSleep(millis);
-  }
+    abstract public void doSleep(long millis) throws InterruptedException;
 
-  public abstract long getUnixTime();
+    static class DefaultClock extends Clock {
 
-  public abstract long getNanos();
+        @Override
+        public long getNanos() {
+            return System.nanoTime();
+        }
 
-  public abstract Date getDate();
+        @Override
+        public long getUnixTime() {
+            return System.currentTimeMillis();
+        }
 
-  abstract public void doSleep(long millis) throws InterruptedException;
+        @Override
+        public Date getDate() {
+            return new Date();
+        }
+
+        @Override
+        public void doSleep(long millis) throws InterruptedException {
+            Thread.sleep(millis);
+        }
+
+    }
 }
